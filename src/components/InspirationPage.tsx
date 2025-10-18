@@ -2,8 +2,56 @@ import { motion } from "motion/react";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { DetailModal } from "./DetailModal";
-import { storyBlueprints } from "../data/storyBlueprints";
-import type { StoryBlueprint } from "../types/story";
+
+const exampleStories = [
+  {
+    title: "Хитрый обман бая",
+    prompt: "Алдар Косе приходит на базар и видит богатого бая, который хвастается своим богатством. Алдар предлагает баю выгодную сделку на его старого коня. Бай соглашается, думая, что обманывает хитреца. Алдар уезжает на лучшем коне бая, оставив его с дряхлой лошадью.",
+    storyboardImage: "https://images.unsplash.com/photo-1626513507309-d67e162e0658?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21pYyUyMGJvb2slMjBzdG9yeWJvYXJkfGVufDF8fHx8MTc2MDc4NDY3NXww&ixlib=rb-4.1.0&q=80&w=1080",
+    frames: [
+      {
+        thumbnail: "https://images.unsplash.com/photo-1562236457-bdc2bec633cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFkaXRpb25hbCUyMG1hcmtldCUyMGJhemFhcnxlbnwxfHx8fDE3NjA3ODMwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Алдар Косе прибывает на оживленный базар, где богатый бай хвастается перед толпой.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1669012520437-5102e3fd4589?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aXNlJTIwZWxkZXJseSUyMG1lcmNoYW50fGVufDF8fHx8MTc2MDc4NDAyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Бай с гордостью демонстрирует свое богатство и лучших коней.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1728300250509-f7b954491905?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXJrZXRwbGFjZSUyMGNvbnZlcnNhdGlvbnxlbnwxfHx8fDE3NjA3ODM1NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Алдар подходит к баю и предлагает сделку на своего старого коня.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1629818986721-23061616633f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjB3YWxraW5nJTIwYXdheSUyMHN1bnNldHxlbnwxfHx8fDE3NjA3ODM1NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Алдар уезжает на прекрасном коне бая на закате, оставив его с дряхлой лошадью.",
+      },
+    ],
+  },
+  {
+    title: "Мудрость против жадности",
+    prompt:
+      "Торговец на рынке отказывается дать еду голодному путнику. Алдар Косе подходит и предлагает сделку — он расскажет три мудрости за обед. Торговец соглашается из любопытства. После еды Алдар рассказывает очевидные истины, и торговец понимает, что его перехитрили.",
+    storyboardImage: "https://images.unsplash.com/photo-1760113671986-63ccb46ae202?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmFwaGljJTIwbm92ZWwlMjBwYW5lbHN8ZW58MXx8fHwxNzYwNzg0Njc1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    frames: [
+      {
+        thumbnail: "https://images.unsplash.com/photo-1690323027409-ba9c96ae1c7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmNpZW50JTIwc3Rvcnl0ZWxsZXIlMjBiYXphYXJ8ZW58MXx8fHwxNzYwNzg0MDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Голодный путник просит еды у жадного торговца на рынке.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1642520312867-3b13e53c9bad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMHN0b3J5dGVsbGluZ3xlbnwxfHx8fDE3NjA3ODM1NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Алдар Косе появляется и предлагает торговцу интересную сделку.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1722252799903-797424adcd2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjZWxlYnJhdGlvbiUyMGZlYXN0JTIwdHJhZGl0aW9uYWx8ZW58MXx8fHwxNzYwNzg0MDIxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Торговец соглашается и накрывает щедрый обед.",
+      },
+      {
+        thumbnail: "https://images.unsplash.com/photo-1760420910499-f7e2bc16bd2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkcmFtYXRpYyUyMHNjZW5lJTIwdmlsbGFnZXxlbnwxfHx8fDE3NjA3ODM1NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        caption: "Алдар рассказывает очевидные истины, торговец осознает, что его обманули.",
+      },
+    ],
+  },
+];
 
 export function InspirationPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
