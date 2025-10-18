@@ -55,7 +55,7 @@ const exampleStories = [
 
 export function InspirationPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [selectedStory, setSelectedStory] = useState<typeof exampleStories[0] | null>(null);
+  const [selectedStory, setSelectedStory] = useState<StoryBlueprint | null>(null);
 
   const handleCopy = (text: string, index: number) => {
     // Try modern Clipboard API first
@@ -130,7 +130,7 @@ export function InspirationPage() {
         </motion.div>
 
         {/* Example Showcase Sections */}
-        {exampleStories.map((story, storyIndex) => (
+        {storyBlueprints.map((story, storyIndex) => (
           <motion.section
             key={storyIndex}
             initial={{ opacity: 0, y: 30 }}
@@ -164,6 +164,16 @@ export function InspirationPage() {
                   }}
                 >
                   Промпт, который был использован:
+                </p>
+                <p
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: '16px',
+                    lineHeight: '1.6',
+                    marginBottom: '16px',
+                  }}
+                >
+                  {story.summary}
                 </p>
                 <div
                   className="relative rounded-2xl p-6"
@@ -260,6 +270,7 @@ export function InspirationPage() {
           storyboardImage={selectedStory.storyboardImage}
           prompt={selectedStory.prompt}
           frames={selectedStory.frames}
+          summary={selectedStory.summary}
           title={`Детали: ${selectedStory.title}`}
         />
       )}
