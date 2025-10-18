@@ -15,6 +15,7 @@ interface DetailModalProps {
   prompt: string;
   frames: Frame[];
   title: string;
+  summary?: string;
 }
 
 export function DetailModal({
@@ -24,6 +25,7 @@ export function DetailModal({
   prompt,
   frames,
   title,
+  summary,
 }: DetailModalProps) {
   const [isCopied, setIsCopied] = useState(false);
 
@@ -114,6 +116,40 @@ export function DetailModal({
               >
                 Детали вашей истории
               </h2>
+
+              {summary && (
+                <div className="mb-6">
+                  <p
+                    className="mb-3"
+                    style={{
+                      color: '#8A2BE2',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Краткий синопсис
+                  </p>
+                  <div
+                    className="rounded-2xl p-6"
+                    style={{
+                      backgroundColor: '#111111',
+                      border: '1px solid #333333',
+                    }}
+                  >
+                    <p
+                      style={{
+                        color: '#FFFFFF',
+                        fontSize: '16px',
+                        lineHeight: '1.6',
+                      }}
+                    >
+                      {summary}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Prompt Card */}
               <div className="mb-6">

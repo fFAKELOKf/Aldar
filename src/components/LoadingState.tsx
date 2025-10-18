@@ -1,6 +1,15 @@
 import { motion } from "motion/react";
 
-export function LoadingState() {
+interface LoadingStateProps {
+  scenario?: string;
+}
+
+export function LoadingState({ scenario }: LoadingStateProps) {
+  const preview = scenario?.trim();
+  const truncatedPreview = preview && preview.length > 160
+    ? `${preview.slice(0, 157)}...`
+    : preview;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -86,6 +95,24 @@ export function LoadingState() {
       >
         Магия происходит... Алдар Косе уже в пути...
       </motion.p>
+
+      {truncatedPreview && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-6 max-w-xl text-center px-6 py-4 rounded-xl"
+          style={{
+            backgroundColor: 'rgba(17, 17, 17, 0.65)',
+            border: '1px solid #333333',
+            color: '#A0A0A0',
+            fontSize: '14px',
+            lineHeight: '1.6',
+          }}
+        >
+          <span style={{ color: '#8A2BE2', fontWeight: 500 }}>Ваш промпт:</span> {truncatedPreview}
+        </motion.div>
+      )}
 
       <motion.div
         animate={{ opacity: [0.5, 1, 0.5] }}

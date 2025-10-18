@@ -2,49 +2,31 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Download } from "lucide-react";
 import { DetailModal } from "./DetailModal";
+import type { GeneratedStoryboard } from "../types/story";
 
 interface ResultStateProps {
-  scenario: string;
+  story: GeneratedStoryboard;
   onStartOver: () => void;
 }
 
-// Mock storyboard data with composite image and individual frames
-const mockStoryboardData = {
-  storyboardImage: "https://images.unsplash.com/photo-1747767899259-66b344c2c265?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbGx1c3RyYXRpb24lMjBzZXF1ZW5jZSUyMGFydHxlbnwxfHx8fDE3NjA3ODQ2NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  frames: [
-    {
-      thumbnail: "https://images.unsplash.com/photo-1562236457-bdc2bec633cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFkaXRpb25hbCUyMG1hcmtldCUyMGJhemFhcnxlbnwxfHx8fDE3NjA3ODMwNDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Алдар Косе приходит на оживленный восточный базар ранним утром",
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1642520312867-3b13e53c9bad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMHN0b3J5dGVsbGluZ3xlbnwxfHx8fDE3NjA3ODM1NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Крупный план: Алдар Косе замечает жадного торговца",
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1728300250509-f7b954491905?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXJrZXRwbGFjZSUyMGNvbnZlcnNhdGlvbnxlbnwxfHx8fDE3NjA3ODM1NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Алдар Косе ведет умную беседу с торговцем, используя свою хитрость",
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1679270107593-08c4c38f6fc2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFkaXRpb25hbCUyMGNsb3RoaW5nJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzYwNzgzNTYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Торговец передает еду Алдару, думая, что совершил выгодную сделку",
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1629818986721-23061616633f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjB3YWxraW5nJTIwYXdheSUyMHN1bnNldHxlbnwxfHx8fDE3NjA3ODM1NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Алдар Косе уходит с базара с едой и широкой улыбкой",
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1760420910499-f7e2bc16bd2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkcmFtYXRpYyUyMHNjZW5lJTIwdmlsbGFnZXxlbnwxfHx8fDE3NjA3ODM1NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      caption: "Торговец остается в полном недоумении, осознав обман",
-    },
-  ],
+const confidenceLabel: Record<GeneratedStoryboard['matchConfidence'], string> = {
+  high: 'высокая',
+  medium: 'средняя',
+  low: 'базовая',
 };
 
-export function ResultState({ scenario, onStartOver }: ResultStateProps) {
+const confidenceAccent: Record<GeneratedStoryboard['matchConfidence'], string> = {
+  high: '#22C55E',
+  medium: '#F97316',
+  low: '#8A2BE2',
+};
+
+export function ResultState({ story, onStartOver }: ResultStateProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDownloadImage = () => {
     const link = document.createElement('a');
-    link.href = mockStoryboardData.storyboardImage;
+    link.href = story.storyboardImage;
     link.download = 'storyboard.png';
     document.body.appendChild(link);
     link.click();
@@ -53,11 +35,17 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
 
   const handleDownloadJson = () => {
     const jsonData = {
-      scenario: scenario,
-      storyboard: mockStoryboardData.frames,
-      generatedAt: new Date().toISOString(),
+      title: story.title,
+      scenario: story.scenario,
+      summary: story.summary,
+      storyboard: story.frames,
+      matchedKeywords: story.matchedKeywords,
+      matchConfidence: story.matchConfidence,
+      generatedAt: story.generatedAt,
     };
-    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -67,6 +55,16 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  const generatedAtDate = new Date(story.generatedAt);
+  const formattedGeneratedAt = Number.isNaN(generatedAtDate.getTime())
+    ? null
+    : generatedAtDate.toLocaleString('ru-RU', {
+        dateStyle: 'long',
+        timeStyle: 'short',
+      });
+
+  const hasKeywords = story.matchedKeywords.length > 0;
 
   return (
     <motion.div
@@ -85,15 +83,118 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
           className="mb-8"
         >
           <h2
-            className="mb-6"
+            className="mb-4"
             style={{
               color: '#FFFFFF',
-              fontSize: '28px',
+              fontSize: '32px',
               fontWeight: 500,
             }}
           >
-            Готово! Ваша история ожила:
+            Готово! {story.title}
           </h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            style={{
+              color: '#A0A0A0',
+              fontSize: '16px',
+              lineHeight: '1.7',
+              marginBottom: '20px',
+              maxWidth: '860px',
+            }}
+          >
+            {story.summary}
+          </motion.p>
+
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <span
+              style={{
+                color: '#A0A0A0',
+                fontSize: '14px',
+              }}
+            >
+              Уверенность подбора:{' '}
+              <span style={{ color: confidenceAccent[story.matchConfidence], fontWeight: 500 }}>
+                {confidenceLabel[story.matchConfidence]}
+              </span>
+            </span>
+            {formattedGeneratedAt && (
+              <span
+                style={{
+                  color: '#A0A0A0',
+                  fontSize: '14px',
+                }}
+              >
+                Сгенерировано: {formattedGeneratedAt}
+              </span>
+            )}
+          </div>
+
+          {hasKeywords ? (
+            <div className="flex flex-wrap gap-2 mb-8">
+              {story.matchedKeywords.map((keyword) => (
+                <span
+                  key={keyword}
+                  className="px-3 py-1 rounded-full text-sm"
+                  style={{
+                    backgroundColor: '#1C1C1C',
+                    border: '1px solid #333333',
+                    color: '#FFFFFF',
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  #{keyword}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                color: '#A0A0A0',
+                fontSize: '14px',
+                marginBottom: '24px',
+              }}
+            >
+              Мы не нашли конкретных ключевых слов, поэтому адаптировали раскадровку под общий тон вашего промпта.
+            </p>
+          )}
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-10 rounded-2xl"
+            style={{
+              backgroundColor: '#111111',
+              border: '1px solid #333333',
+            }}
+          >
+            <div className="px-6 py-5 space-y-2">
+              <p
+                style={{
+                  color: '#8A2BE2',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Ваш промпт
+              </p>
+              <p
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: '15px',
+                  lineHeight: '1.7',
+                  fontFamily: 'ui-monospace, monospace',
+                }}
+              >
+                {story.scenario}
+              </p>
+            </div>
+          </motion.div>
 
           {/* Action Bar */}
           <div className="flex flex-wrap gap-4 mb-12">
@@ -117,7 +218,7 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
 
             <motion.button
               onClick={handleDownloadJson}
-              whileHover={{ 
+              whileHover={{
                 backgroundColor: '#FF00FF',
                 boxShadow: '0 0 30px rgba(255, 0, 255, 0.3)',
               }}
@@ -162,7 +263,7 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
           className="flex justify-center"
         >
           <motion.div
-            whileHover={{ 
+            whileHover={{
               scale: 1.02,
               borderColor: '#8A2BE2',
               boxShadow: '0 0 40px rgba(138, 43, 226, 0.4)',
@@ -177,8 +278,8 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
             }}
           >
             <img
-              src={mockStoryboardData.storyboardImage}
-              alt="Сгенерированная раскадровка"
+              src={story.storyboardImage}
+              alt={`Сгенерированная раскадровка: ${story.title}`}
               className="w-full h-auto"
             />
           </motion.div>
@@ -203,10 +304,11 @@ export function ResultState({ scenario, onStartOver }: ResultStateProps) {
       <DetailModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        storyboardImage={mockStoryboardData.storyboardImage}
-        prompt={scenario}
-        frames={mockStoryboardData.frames}
-        title="Детали раскадровки"
+        storyboardImage={story.storyboardImage}
+        prompt={story.scenario}
+        frames={story.frames}
+        summary={story.summary}
+        title={`Детали раскадровки: ${story.title}`}
       />
     </motion.div>
   );
